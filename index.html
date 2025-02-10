@@ -3,40 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Search Bar</title>
+    <title>Dropdown with Display Board & Discounts</title>
     <style>
         body {
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             height: 100vh;
             background-color: #f8f9fa;
             font-family: Arial, sans-serif;
         }
-        .search-container {
+        .display-board {
+            background-color: black;
+            color: red;
+            font-size: 48px;
+            font-weight: bold;
+            text-align: center;
+            width: 200px;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .dropdown-container {
             display: flex;
             justify-content: center;
             align-items: center;
             width: 100%;
             max-width: 600px;
+            margin-bottom: 20px;
         }
-        .search-box {
+        .dropdown-box {
             width: 100%;
             padding: 12px 20px;
             border: 1px solid #dfe1e5;
             border-radius: 24px;
             font-size: 16px;
             outline: none;
-            transition: box-shadow 0.3s ease-in-out;
+            background-color: white;
+            cursor: pointer;
         }
-        .search-box:focus {
-            box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+        .checkbox-container {
+            display: flex;
+            flex-direction: column;
+            align-items: start;
+            margin-top: 10px;
+        }
+        .checkbox-container label {
+            font-size: 16px;
+            margin: 5px 0;
         }
     </style>
 </head>
 <body>
-    <div class="search-container">
-        <input type="text" class="search-box" placeholder="Search...">
+    <div class="display-board" id="price-board">$215</div>
+    <div class="dropdown-container">
+        <select class="dropdown-box">
+            <option>Wuye, Abuja, Nigeria</option>
+        </select>
     </div>
+    <div class="checkbox-container">
+        <label><input type="checkbox" id="nigerian" class="discount-checkbox" data-discount="0.02"> Are you Nigerian</label>
+        <label><input type="checkbox" id="abuja" class="discount-checkbox" data-discount="0.05"> Are you based in Abuja</label>
+        <label><input type="checkbox" id="poor" class="discount-checkbox" data-discount="0.30"> Are you poor</label>
+        <label><input type="checkbox" id="discount" class="discount-checkbox" data-discount="0.50"> Do you have a discount code</label>
+    </div>
+    <script>
+        const basePrice = 215;
+        const priceBoard = document.getElementById("price-board");
+        const nigerian = document.getElementById("nigerian");
+        const abuja = document.getElementById("abuja");
+        const poor = document.getElementById("poor");
+        const discount = document.getElementById("discount");
+        const checkboxes = [nigerian, abuja, poor, discount];
+
+        function updatePrice() {
+            let discountedPrice = basePrice;
+            checkboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    discountedPrice -= basePrice * parseFloat(checkbox.dataset.discount);
+                }
+            });
+            priceBoard.textContent = `$${discountedPrice.toFixed(2)}`;
+        }
+
+        function handleCheckboxRestrictions() {
+            if (nigerian.checked || abuja.checked) {
+                poor.checked = false;
+                discount.checked = false;
+                poor.disabled = false;
+                discount.disabled = false;
+            }
+            if (poor.checked) {
+                nigerian.checked = false;
+                abuja.checked = false;
+                discount.checked = false;
+                nigerian.disabled = false;
+                abuja.disabled = false;
+                discount.disabled = false;
+            }
+            if (discount.checked) {
+                checkboxes.forEach(checkbox => {
+                    if (checkbox !== discount) {
+                        checkbox.checked = false;
+                        checkbox.disabled = true;
+                    }
+                });
+            } else {
+                checkboxes.forEach(checkbox => checkbox.disabled = false);
+            }
+            updatePrice();
+        }
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener("change", handleCheckboxRestrictions);
+        });
+    </script>
 </body>
 </html>
