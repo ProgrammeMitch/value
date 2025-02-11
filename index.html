@@ -43,11 +43,16 @@
             background-color: white;
             cursor: pointer;
         }
+        .checkbox-wrapper {
+            display: flex;
+            justify-content: space-between;
+            width: 600px;
+            margin-top: 10px;
+        }
         .checkbox-container {
             display: flex;
             flex-direction: column;
             align-items: start;
-            margin-top: 10px;
         }
         .checkbox-container label {
             font-size: 16px;
@@ -62,11 +67,18 @@
             <option>Wuye, Abuja, Nigeria</option>
         </select>
     </div>
-    <div class="checkbox-container">
-        <label><input type="checkbox" id="nigerian" class="discount-checkbox" data-discount="0.02"> Are you Nigerian</label>
-        <label><input type="checkbox" id="abuja" class="discount-checkbox" data-discount="0.05"> Are you based in Abuja</label>
-        <label><input type="checkbox" id="poor" class="discount-checkbox" data-discount="0.30"> Are you poor</label>
-        <label><input type="checkbox" id="discount" class="discount-checkbox" data-discount="0.50"> Do you have a discount code</label>
+    <div class="checkbox-wrapper">
+        <div class="checkbox-container">
+            <label><input type="checkbox" id="nigerian" class="discount-checkbox" data-discount="0.02"> Are you Nigerian</label>
+            <label><input type="checkbox" id="abuja" class="discount-checkbox" data-discount="0.05"> Are you based in Abuja</label>
+            <label><input type="checkbox" id="poor" class="discount-checkbox" data-discount="0.30"> Are you poor</label>
+            <label><input type="checkbox" id="discount" class="discount-checkbox" data-discount="0.50"> Do you have a discount code</label>
+        </div>
+        <div class="checkbox-container">
+            <label><input type="checkbox" id="chauffeur" class="extra-checkbox" data-extra="0.03"> Chauffeur & Luxury Car Rentals</label>
+            <label><input type="checkbox" id="chef" class="extra-checkbox" data-extra="0.20"> Private Chef & Catering</label>
+            <label><input type="checkbox" id="spa" class="extra-checkbox" data-extra="0.10"> Wellness & Spa Services</label>
+        </div>
     </div>
     <script>
         const basePrice = 215;
@@ -75,16 +87,25 @@
         const abuja = document.getElementById("abuja");
         const poor = document.getElementById("poor");
         const discount = document.getElementById("discount");
-        const checkboxes = [nigerian, abuja, poor, discount];
+        const chauffeur = document.getElementById("chauffeur");
+        const chef = document.getElementById("chef");
+        const spa = document.getElementById("spa");
+        const discountCheckboxes = [nigerian, abuja, poor, discount];
+        const extraCheckboxes = [chauffeur, chef, spa];
 
         function updatePrice() {
-            let discountedPrice = basePrice;
-            checkboxes.forEach(checkbox => {
+            let finalPrice = basePrice;
+            discountCheckboxes.forEach(checkbox => {
                 if (checkbox.checked) {
-                    discountedPrice -= basePrice * parseFloat(checkbox.dataset.discount);
+                    finalPrice -= basePrice * parseFloat(checkbox.dataset.discount);
                 }
             });
-            priceBoard.textContent = `$${discountedPrice.toFixed(2)}`;
+            extraCheckboxes.forEach(checkbox => {
+                if (checkbox.checked) {
+                    finalPrice += basePrice * parseFloat(checkbox.dataset.extra);
+                }
+            });
+            priceBoard.textContent = `$${finalPrice.toFixed(2)}`;
         }
 
         function handleCheckboxRestrictions() {
@@ -103,20 +124,23 @@
                 discount.disabled = false;
             }
             if (discount.checked) {
-                checkboxes.forEach(checkbox => {
+                discountCheckboxes.forEach(checkbox => {
                     if (checkbox !== discount) {
                         checkbox.checked = false;
                         checkbox.disabled = true;
                     }
                 });
             } else {
-                checkboxes.forEach(checkbox => checkbox.disabled = false);
+                discountCheckboxes.forEach(checkbox => checkbox.disabled = false);
             }
             updatePrice();
         }
 
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener("change", handleCheckboxRestrictions);
+        [...discountCheckboxes, ...extraCheckboxes].forEach(checkbox => {
+            checkbox.addEventListener("change", () => {
+                handleCheckboxRestrictions();
+                updatePrice();
+            });
         });
     </script>
 </body>
